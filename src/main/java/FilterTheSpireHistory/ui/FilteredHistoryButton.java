@@ -1,4 +1,4 @@
-package FilterTheSpireHistory.mainMenu;
+package FilterTheSpireHistory.ui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -20,21 +20,23 @@ public class FilteredHistoryButton {
     private float glowAlpha;
     private Color glowColor;
     private String buttonText;
-    private static final float SHOW_X;
-    public static final float HIDE_X;
-    private static final float DRAW_Y;
+    private float drawX;
+    public float hideX;
+    private float drawY;
     private static final float TEXT_OFFSET_X;
     private static final float TEXT_OFFSET_Y;
 
-    public FilteredHistoryButton() {
-        this.current_x = HIDE_X;
-        this.target_x = this.current_x;
+    public FilteredHistoryButton(int drawX, int drawY, String buttonText) {
+        this.drawX = drawX * Settings.scale;
+        this.hideX = this.drawX - 400.0F * Settings.scale;
+        this.current_x = this.target_x = this.hideX;
         this.isHidden = true;
         this.glowAlpha = 0.0F;
         this.glowColor = Settings.GOLD_COLOR.cpy();
-        this.buttonText = "NOT_SET";
+        this.buttonText = buttonText;
+        this.drawY = drawY * Settings.scale;
         this.hb = new Hitbox(300.0F * Settings.scale, 100.0F * Settings.scale);
-        this.hb.move(SHOW_X - 106.0F * Settings.scale, DRAW_Y + 60.0F * Settings.scale);
+        this.hb.move(this.drawX - 106.0F * Settings.scale, this.drawY + 60.0F * Settings.scale);
     }
 
     public void update(){
@@ -103,9 +105,9 @@ public class FilteredHistoryButton {
         }
 
         if (Settings.isControllerMode) {
-            FontHelper.renderFontLeft(sb, FontHelper.buttonLabelFont, this.buttonText, this.current_x + TEXT_OFFSET_X - 30.0F * Settings.scale, DRAW_Y + TEXT_OFFSET_Y, tmpColor);
+            FontHelper.renderFontLeft(sb, FontHelper.buttonLabelFont, this.buttonText, this.current_x + TEXT_OFFSET_X - 30.0F * Settings.scale, this.drawY + TEXT_OFFSET_Y, tmpColor);
         } else {
-            FontHelper.renderFontCentered(sb, FontHelper.buttonLabelFont, this.buttonText, this.current_x + TEXT_OFFSET_X, DRAW_Y + TEXT_OFFSET_Y, tmpColor);
+            FontHelper.renderFontCentered(sb, FontHelper.buttonLabelFont, this.buttonText, this.current_x + TEXT_OFFSET_X, this.drawY + TEXT_OFFSET_Y, tmpColor);
         }
 
         this.renderControllerUi(sb);
@@ -115,34 +117,31 @@ public class FilteredHistoryButton {
     }
 
     private void renderShadow(SpriteBatch sb) {
-        sb.draw(ImageMaster.CANCEL_BUTTON_SHADOW, this.current_x - 256.0F, DRAW_Y - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
+        sb.draw(ImageMaster.CANCEL_BUTTON_SHADOW, this.current_x - 256.0F, this.drawY - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
     }
 
     private void renderOutline(SpriteBatch sb) {
-        sb.draw(ImageMaster.CANCEL_BUTTON_OUTLINE, this.current_x - 256.0F, DRAW_Y - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
+        sb.draw(ImageMaster.CANCEL_BUTTON_OUTLINE, this.current_x - 256.0F, this.drawY - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
     }
 
     private void renderButton(SpriteBatch sb) {
-        sb.draw(ImageMaster.CANCEL_BUTTON, this.current_x - 256.0F, DRAW_Y - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
+        sb.draw(ImageMaster.CANCEL_BUTTON, this.current_x - 256.0F, this.drawY - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
     }
 
     private void renderControllerUi(SpriteBatch sb) {
         if (Settings.isControllerMode) {
             sb.setColor(Color.WHITE);
-            sb.draw(CInputActionSet.cancel.getKeyImg(), this.current_x - 32.0F - 210.0F * Settings.scale, DRAW_Y - 32.0F + 57.0F * Settings.scale, 32.0F, 32.0F, 64.0F, 64.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 64, 64, false, false);
+            sb.draw(CInputActionSet.cancel.getKeyImg(), this.current_x - 32.0F - 210.0F * Settings.scale, this.drawY - 32.0F + 57.0F * Settings.scale, 32.0F, 32.0F, 64.0F, 64.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 64, 64, false, false);
         }
 
     }
 
     public void show() {
-        this.buttonText = "Relic Filter";
+        this.current_x = this.drawX;
         if (this.isHidden) {
             this.glowAlpha = 0.0F;
-            this.current_x = HIDE_X;
-            this.target_x = SHOW_X;
+            this.target_x = this.drawX;
             this.isHidden = false;
-        } else {
-            this.current_x = HIDE_X;
         }
 
         this.hb.hovered = false;
@@ -153,15 +152,13 @@ public class FilteredHistoryButton {
             this.hb.clicked = false;
             this.hb.hovered = false;
             InputHelper.justClickedLeft = false;
-            this.target_x = HIDE_X;
+            this.current_x = this.hideX;
+            this.target_x = this.hideX;
             this.isHidden = true;
         }
     }
 
     static {
-        SHOW_X = 256.0F * Settings.scale;
-        DRAW_Y = 600.0F * Settings.scale;
-        HIDE_X = SHOW_X - 400.0F * Settings.scale;
         TEXT_OFFSET_X = -136.0F * Settings.scale;
         TEXT_OFFSET_Y = 57.0F * Settings.scale;
     }
