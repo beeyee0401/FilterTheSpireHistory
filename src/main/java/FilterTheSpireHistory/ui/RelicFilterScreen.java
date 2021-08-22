@@ -12,17 +12,17 @@ import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
-import com.megacrit.cardcrawl.screens.mainMenu.MenuCancelButton;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeSet;
 
 public class RelicFilterScreen {
-    private TreeSet<String> bossRelics = new TreeSet<>();
+    private TreeSet<String> relics = new TreeSet<>();
     private HashMap<String, RelicUIObject> relicUIObjects = new HashMap<>();
     private Texture TEX_BG = new Texture("images/config_screen_bg.png");
-    private FilteredHistoryButton returnButton = new FilteredHistoryButton(256, 400, "Return");
+    private FilteredHistoryButton returnButton = new FilteredHistoryButton(256, 250, "Return");
+    public ArrayList<String> selectedRelics = new ArrayList<>();
     public boolean isShowing = false;
 
     public RelicFilterScreen() {
@@ -31,13 +31,29 @@ public class RelicFilterScreen {
 
     private void populateRelics() {
         ArrayList<String> relics = new ArrayList<>();
+        AbstractRelic.RelicTier[] tiers = new AbstractRelic.RelicTier[] {
+                AbstractRelic.RelicTier.COMMON,
+                AbstractRelic.RelicTier.UNCOMMON,
+                AbstractRelic.RelicTier.RARE,
+                AbstractRelic.RelicTier.BOSS,
+                AbstractRelic.RelicTier.SHOP,
+                AbstractRelic.RelicTier.SPECIAL
+        };
 
-        RelicLibrary.populateRelicPool(relics, AbstractRelic.RelicTier.BOSS, AbstractPlayer.PlayerClass.IRONCLAD);
-        RelicLibrary.populateRelicPool(relics, AbstractRelic.RelicTier.BOSS, AbstractPlayer.PlayerClass.THE_SILENT);
-        RelicLibrary.populateRelicPool(relics, AbstractRelic.RelicTier.BOSS, AbstractPlayer.PlayerClass.DEFECT);
-        RelicLibrary.populateRelicPool(relics, AbstractRelic.RelicTier.BOSS, AbstractPlayer.PlayerClass.WATCHER);
+        AbstractPlayer.PlayerClass[] classes = new AbstractPlayer.PlayerClass[]{
+                AbstractPlayer.PlayerClass.IRONCLAD,
+                AbstractPlayer.PlayerClass.THE_SILENT,
+                AbstractPlayer.PlayerClass.DEFECT,
+                AbstractPlayer.PlayerClass.WATCHER
+        };
 
-        bossRelics.addAll(relics);
+        for (AbstractRelic.RelicTier tier: tiers) {
+            for (AbstractPlayer.PlayerClass c: classes){
+                RelicLibrary.populateRelicPool(relics, tier, c);
+            }
+        }
+
+        this.relics.addAll(relics);
     }
 
     private void makeUIObjects() {
@@ -51,7 +67,7 @@ public class RelicFilterScreen {
         int iy = 0;
         final int perRow = 5;
 
-        for (String id : bossRelics) {
+        for (String id : relics) {
             float tx = left + ix * spacing;
             float ty = top - iy * spacing;
 
@@ -64,20 +80,10 @@ public class RelicFilterScreen {
             }
         }
     }
-    private void loadFromConfig() {
-//        ArrayList<String> loaded = FilterTheSpire.config.getBossSwapFilter();
-//        for (String relic : loaded) {
-//            if (relicUIObjects.containsKey(relic))
-//                relicUIObjects.get(relic).isEnabled = true;
-//        }
-//
-//        refreshFilters();
-    }
 
     private void setup() {
         populateRelics();
         makeUIObjects();
-        loadFromConfig();
     }
 
     public void renderForeground(SpriteBatch sb) {
@@ -155,6 +161,7 @@ public class RelicFilterScreen {
 
         if (this.returnButton.hb.clickStarted){
             enableHitboxes(false);
+            CardCrawlGame.mainMenuScreen.runHistoryScreen.refreshData();
         }
     }
 
@@ -213,8 +220,6 @@ public class RelicFilterScreen {
     }
 
     public void refreshFilters() {
-        ArrayList<String> enabledRelics = getEnabledRelics();
-//        FilterTheSpire.config.setBossSwapFilter(enabledRelics);
-//        FilterManager.setBossSwapFiltersFromValidList(enabledRelics);
+        selectedRelics = getEnabledRelics();
     }
 }

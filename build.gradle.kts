@@ -22,7 +22,6 @@ repositories {
 
 dependencies {
     compileOnly(fileTree(compileOnlyLibs))
-    compileOnly("io.github.casey-c:easel:0.0.1")
     compileOnly("org.apache.commons:commons-lang3:3.12.0")
 
     // Tests

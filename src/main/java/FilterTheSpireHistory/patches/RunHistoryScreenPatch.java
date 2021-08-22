@@ -6,14 +6,18 @@ import FilterTheSpireHistory.utils.ExtraColors;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpireInsertPatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.screens.runHistory.RunHistoryScreen;
+import com.megacrit.cardcrawl.screens.stats.RunData;
+
+import java.util.ArrayList;
 
 public class RunHistoryScreenPatch {
-    private static FilteredHistoryButton relicFilterButton = new FilteredHistoryButton(256, 700, "Relic Filter");
-    private static FilteredHistoryButton cardFilterButton = new FilteredHistoryButton(256, 600, "Card Filter");
+    private static FilteredHistoryButton relicFilterButton = new FilteredHistoryButton(256, 500, "Relic Filter");
+    private static FilteredHistoryButton cardFilterButton = new FilteredHistoryButton(256, 400, "Card Filter");
     private static RelicFilterScreen screen = new RelicFilterScreen();
 
     @SpirePatch(clz= RunHistoryScreen.class, method="render")
@@ -53,6 +57,7 @@ public class RunHistoryScreenPatch {
         public static void Postfix(RunHistoryScreen __instance) {
             relicFilterButton.hide();
             cardFilterButton.hide();
+            screen.selectedRelics.clear();
         }
     }
 
@@ -61,6 +66,21 @@ public class RunHistoryScreenPatch {
         public static void Postfix(RunHistoryScreen __instance) {
             relicFilterButton.show();
             cardFilterButton.show();
+        }
+    }
+
+    @SpirePatch(clz= RunHistoryScreen.class, method="resetRunsDropdown")
+    public static class FilterRunsPatch {
+        @SpireInsertPatch(
+            rloc = 303-229,
+            localvars = {"filteredRuns"}
+        )
+        public static void Insert(RunHistoryScreen __instance, ArrayList<RunData> filteredRuns) {
+            if (screen.selectedRelics.size() > 0){
+                for (String relicId: screen.selectedRelics) {
+                    filteredRuns.removeIf(r -> !r.relics.contains(relicId));
+                }
+            }
         }
     }
 }

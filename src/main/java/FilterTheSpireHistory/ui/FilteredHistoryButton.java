@@ -150,6 +150,7 @@ public class FilteredHistoryButton {
     public void hide(){
         if (!this.isHidden) {
             this.hb.clicked = false;
+            this.hb.clickStarted = false;
             this.hb.hovered = false;
             InputHelper.justClickedLeft = false;
             this.current_x = this.hideX;

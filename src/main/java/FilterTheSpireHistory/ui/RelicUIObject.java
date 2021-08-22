@@ -1,6 +1,7 @@
 package FilterTheSpireHistory.ui;
 
 import FilterTheSpireHistory.utils.ExtraColors;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -9,7 +10,6 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
-import easel.utils.KeyHelper;
 
 public class RelicUIObject {
 
@@ -66,11 +66,11 @@ public class RelicUIObject {
     }
 
     private void handleClick() {
-        if (KeyHelper.isShiftPressed()) {
+        if (Gdx.input.isKeyPressed(59) || Gdx.input.isKeyPressed(60)) {
             CardCrawlGame.sound.play("BLOOD_SPLAT");
             parent.selectAll();
         }
-        else if (KeyHelper.isAltPressed()) {
+        else if (Gdx.input.isKeyPressed(57) || Gdx.input.isKeyPressed(58)) {
             CardCrawlGame.sound.play("MAP_SELECT_3");
             parent.invertAll();
         }
@@ -84,7 +84,7 @@ public class RelicUIObject {
     }
 
     private void handleRightClick() {
-        if (KeyHelper.isShiftPressed()) {
+        if (Gdx.input.isKeyPressed(59) || Gdx.input.isKeyPressed(60)) {
             CardCrawlGame.sound.play("APPEAR");
             parent.clearAll();
         }
