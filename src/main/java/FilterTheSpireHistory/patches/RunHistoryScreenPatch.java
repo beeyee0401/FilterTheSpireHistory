@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInsertPatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
+import com.evacipated.cardcrawl.modthespire.lib.SpireReturn;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.screens.runHistory.RunHistoryScreen;
@@ -16,8 +17,8 @@ import com.megacrit.cardcrawl.screens.stats.RunData;
 import java.util.ArrayList;
 
 public class RunHistoryScreenPatch {
-    private static FilteredHistoryButton relicFilterButton = new FilteredHistoryButton(256, 500, "Relic Filter");
-    private static FilteredHistoryButton cardFilterButton = new FilteredHistoryButton(256, 400, "Card Filter");
+    private static FilteredHistoryButton relicFilterButton = new FilteredHistoryButton(256, 400, "Relic Filter");
+    private static FilteredHistoryButton cardFilterButton = new FilteredHistoryButton(256, 300, "Card Filter");
     private static RelicFilterScreen screen = new RelicFilterScreen();
 
     @SpirePatch(clz= RunHistoryScreen.class, method="render")
@@ -33,8 +34,8 @@ public class RunHistoryScreenPatch {
     }
 
     @SpirePatch(clz= RunHistoryScreen.class, method="update")
-    public static class UpdateFilteredButton {
-        public static void Postfix(RunHistoryScreen __instance) {
+    public static class PreventHitboxesPatch {
+        public static SpireReturn Prefix(RunHistoryScreen __instance) {
             relicFilterButton.update();
             cardFilterButton.update();
             screen.update();
@@ -44,11 +45,14 @@ public class RunHistoryScreenPatch {
             }
             if (screen.isShowing){
                 screen.enableHitboxes(true);
+                return SpireReturn.Return(null);
             }
 
             if (cardFilterButton.hb.clicked) {
                 // card filter button clicked
             }
+
+            return SpireReturn.Continue();
         }
     }
 

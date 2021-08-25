@@ -10,24 +10,104 @@ import com.megacrit.cardcrawl.core.CardCrawlGame;
 import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.FontHelper;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
+import com.megacrit.cardcrawl.helpers.MathHelper;
 import com.megacrit.cardcrawl.helpers.RelicLibrary;
+import com.megacrit.cardcrawl.helpers.input.InputHelper;
 import com.megacrit.cardcrawl.relics.AbstractRelic;
+import com.megacrit.cardcrawl.screens.mainMenu.ScrollBar;
+import com.megacrit.cardcrawl.screens.mainMenu.ScrollBarListener;
+import com.megacrit.cardcrawl.screens.runHistory.RunHistoryScreen;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.TreeSet;
+import java.util.*;
 
-public class RelicFilterScreen {
+public class RelicFilterScreen implements ScrollBarListener {
     private TreeSet<String> relics = new TreeSet<>();
     private HashMap<String, RelicUIObject> relicUIObjects = new HashMap<>();
     private Texture TEX_BG = new Texture("images/config_screen_bg.png");
-    private FilteredHistoryButton returnButton = new FilteredHistoryButton(256, 250, "Return");
+    private FilteredHistoryButton returnButton = new FilteredHistoryButton(256, 150, "Close");
     public ArrayList<String> selectedRelics = new ArrayList<>();
     public boolean isShowing = false;
+    public final int RELICS_PER_ROW = 7;
+
+    // Position
+    public float x;
+    public float y;
+
+    // Scrolling
+    private ScrollBar scrollBar = null;
+    private boolean grabbedScreen = false;
+    private float grabStartY = 0.0F;
+    private float scrollTargetY = 0.0F;
+    private float scrollY = 0.0F;
+    private float scrollLowerBound = -Settings.DEFAULT_SCROLL_LIMIT;
+    private float scrollUpperBound = Settings.DEFAULT_SCROLL_LIMIT;
 
     public RelicFilterScreen() {
         setup();
+
+        // Setup scrollbar
+        if (this.scrollBar == null) {
+            calculateScrollBounds();
+            this.scrollBar = new ScrollBar(this, 0, 0, 400.0F * Settings.scale);
+        }
+
+        this.move(0, 0);
     }
+
+    public void move(float x, float y) {
+        this.x = x;
+        this.y = y;
+
+        scrollBar.setCenter(x + 1100f * Settings.scale, y + 465f * Settings.scale);
+    }
+
+    //  Begin scroll functions
+    private void updateScrolling() {
+        int y = InputHelper.mY;
+        if (!this.grabbedScreen) {
+            if (InputHelper.scrolledDown) {
+                this.scrollTargetY += Settings.SCROLL_SPEED / ((Settings.SCROLL_SPEED / RELICS_PER_ROW) - 1);
+            } else if (InputHelper.scrolledUp) {
+                this.scrollTargetY -= Settings.SCROLL_SPEED / ((Settings.SCROLL_SPEED / RELICS_PER_ROW) - 1);
+            }
+            if (InputHelper.justClickedLeft) {
+                this.grabbedScreen = true;
+                this.grabStartY = y - this.scrollTargetY;
+            }
+        } else if (InputHelper.isMouseDown) {
+            this.scrollTargetY = y - this.grabStartY;
+        } else {
+            this.grabbedScreen = false;
+        }
+        this.scrollY = MathHelper.scrollSnapLerpSpeed(this.scrollY, this.scrollTargetY);
+        resetScrolling();
+        updateBarPosition();
+    }
+
+    public void scrolledUsingBar(float newPercent) {
+        this.scrollY = MathHelper.valueFromPercentBetween(this.scrollLowerBound, this.scrollUpperBound, newPercent);
+        this.scrollTargetY = this.scrollY;
+        updateBarPosition();
+    }
+
+    private void updateBarPosition() {
+        float percent = MathHelper.percentFromValueBetween(this.scrollLowerBound, this.scrollUpperBound, this.scrollY);
+        this.scrollBar.parentScrolledToPercent(percent);
+    }
+
+    private void calculateScrollBounds() {
+        this.scrollUpperBound = 100.0F * Settings.scale;
+        this.scrollLowerBound = 0F * Settings.scale;
+    }
+
+    private void resetScrolling() {
+        if (this.scrollTargetY < this.scrollLowerBound) {
+            this.scrollTargetY = MathHelper.scrollSnapLerpSpeed(this.scrollTargetY, this.scrollLowerBound);
+        } else if (this.scrollTargetY > this.scrollUpperBound) {
+            this.scrollTargetY = MathHelper.scrollSnapLerpSpeed(this.scrollTargetY, this.scrollUpperBound);
+        }
+    }
+    //  End scroll functions
 
     private void populateRelics() {
         ArrayList<String> relics = new ArrayList<>();
@@ -53,7 +133,8 @@ public class RelicFilterScreen {
             }
         }
 
-        this.relics.addAll(relics);
+        HashSet<String> unique = new HashSet<>(relics);
+        this.relics.addAll(unique);
     }
 
     private void makeUIObjects() {
@@ -65,7 +146,6 @@ public class RelicFilterScreen {
 
         int ix = 0;
         int iy = 0;
-        final int perRow = 5;
 
         for (String id : relics) {
             float tx = left + ix * spacing;
@@ -74,7 +154,7 @@ public class RelicFilterScreen {
             relicUIObjects.put(id, new RelicUIObject(this, id, tx, ty));
 
             ix++;
-            if (ix > perRow) {
+            if (ix == RELICS_PER_ROW) {
                 ix = 0;
                 iy++;
             }
@@ -92,18 +172,21 @@ public class RelicFilterScreen {
         for (RelicUIObject x : relicUIObjects.values())
             x.render(sb);
 
+        this.returnButton.render(sb);
+        this.scrollBar.render(sb);
+
         // Title text
         float titleLeft = 386.0f;
         float titleBottom = 819.0f;
-        FontHelper.renderFontLeftDownAligned(sb, ExtraFonts.configTitleFont(), "Neow Boss Swaps", titleLeft * Settings.scale, titleBottom * Settings.scale, Settings.GOLD_COLOR);
+        FontHelper.renderFontLeftDownAligned(sb, ExtraFonts.configTitleFont(), "Relic List", titleLeft * Settings.scale, titleBottom * Settings.scale, Settings.GOLD_COLOR);
 
-        float infoLeft = 1120.0f;
+        float infoLeft = 1160.0f;
         float infoTopMain = 667.0f;
         float infoTopControls = 472.0f;
 
         FontHelper.renderSmartText(sb,
                 FontHelper.tipBodyFont,
-                "This filter allows you to choose which Boss Relics will appear from Neow's swap option. If no relics are selected, it will choose from the entire pool.",
+                "This filter allows you to choose which Relics a run must have to show in the history.",
                 infoLeft * Settings.scale,
                 infoTopMain * Settings.scale,
                 371.0f * Settings.scale,
@@ -137,8 +220,6 @@ public class RelicFilterScreen {
     }
 
     public void render(SpriteBatch sb) {
-        this.returnButton.render(sb);
-
         sb.setColor(ExtraColors.SCREEN_DIM);
         sb.draw(ImageMaster.WHITE_SQUARE_IMG, 0, 0, Settings.WIDTH, Settings.HEIGHT);
 
@@ -156,12 +237,20 @@ public class RelicFilterScreen {
 
     public void update() {
         this.returnButton.update();
-        for (RelicUIObject x : relicUIObjects.values())
-            x.update();
+        for (RelicUIObject relicObject : relicUIObjects.values()) {
+            relicObject.update();
+            relicObject.scroll(this.scrollY);
+        }
 
         if (this.returnButton.hb.clickStarted){
             enableHitboxes(false);
+            CardCrawlGame.mainMenuScreen.runHistoryScreen.button.showInstantly(RunHistoryScreen.TEXT[3]);
             CardCrawlGame.mainMenuScreen.runHistoryScreen.refreshData();
+        }
+
+        boolean isDraggingScrollBar = this.scrollBar.update();
+        if (!isDraggingScrollBar){
+            updateScrolling();
         }
     }
 

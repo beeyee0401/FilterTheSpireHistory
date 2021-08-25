@@ -16,9 +16,10 @@ public class RelicUIObject {
     private Hitbox hb;
 
     public String relicID;
-    private float x, y;
+    private float x, y, scroll;
     private Texture tex;
     private static final Texture TEX_SELECTED_BG = new Texture("images/relic_bg.png");
+    private static final int HITBOX_OFFSET = 50;
 
     public boolean isEnabled = false;
     private RelicFilterScreen parent;
@@ -34,10 +35,12 @@ public class RelicUIObject {
         hb = new Hitbox(hbSize * Settings.scale, hbSize * Settings.scale);
     }
 
+    public void scroll(float scrollY) {
+        this.scroll = scrollY * ((Settings.SCROLL_SPEED / parent.RELICS_PER_ROW) - 1);
+    }
+
     public void enableHitbox() {
-        // Need to adjust them (hb are centered) -- this random guess is probably totally off
-        int hbOffset = 50;
-        hb.move((x + hbOffset) * Settings.scale, (y + hbOffset) * Settings.scale);
+        hb.move((x + HITBOX_OFFSET) * Settings.scale, (y + HITBOX_OFFSET + this.scroll) * Settings.scale);
     }
 
     public void disableHitbox() {
@@ -51,15 +54,14 @@ public class RelicUIObject {
 
         if (isEnabled) {
             sb.setColor(ExtraColors.SEL_RELIC_BG);
-            sb.draw(TEX_SELECTED_BG, x * Settings.scale, y * Settings.scale, s * Settings.scale, s * Settings.scale);
+            sb.draw(TEX_SELECTED_BG, x * Settings.scale, (y + this.scroll) * Settings.scale, s * Settings.scale, s * Settings.scale);
 
             sb.setColor(Color.WHITE);
         } else {
             sb.setColor(ExtraColors.DIM_RELIC);
         }
 
-
-        sb.draw(tex, x * Settings.scale, y * Settings.scale, s * Settings.scale, s * Settings.scale);
+        sb.draw(tex, x * Settings.scale, (y + this.scroll) * Settings.scale, s * Settings.scale, s * Settings.scale);
 
         // DEBUG
         hb.render(sb);
