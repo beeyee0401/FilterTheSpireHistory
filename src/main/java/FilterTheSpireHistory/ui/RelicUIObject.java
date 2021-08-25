@@ -16,8 +16,7 @@ public class RelicUIObject {
     private Hitbox hb;
 
     public String relicID;
-    private float x, scroll;
-    public float y;
+    private float x, y, scroll;
     private Texture tex;
     private static final Texture TEX_SELECTED_BG = new Texture("images/relic_bg.png");
     private static final int HITBOX_OFFSET = 50;
@@ -38,6 +37,10 @@ public class RelicUIObject {
 
     public void scroll(float scrollY) {
         this.scroll = scrollY * ((Settings.SCROLL_SPEED / parent.RELICS_PER_ROW) - 1);
+    }
+
+    public float getScrollPosition(){
+        return (y + this.scroll) * Settings.yScale;
     }
 
     public void enableHitbox() {

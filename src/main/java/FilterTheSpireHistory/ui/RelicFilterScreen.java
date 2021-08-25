@@ -169,9 +169,10 @@ public class RelicFilterScreen implements ScrollBarListener {
     public void renderForeground(SpriteBatch sb) {
         sb.setColor(Color.WHITE);
 
-        for (RelicUIObject x : relicUIObjects.values()){
-            if (x.y > 1 && x.y < 3){
-                x.render(sb);
+        for (RelicUIObject relicUIObject : relicUIObjects.values()){
+            if (relicUIObject.getScrollPosition() > ((this.scrollLowerBound + 200) * Settings.yScale) &&
+                    relicUIObject.getScrollPosition() < ((this.scrollUpperBound + 500) * Settings.yScale)){
+                relicUIObject.render(sb);
             }
         }
 
@@ -218,6 +219,13 @@ public class RelicFilterScreen implements ScrollBarListener {
         } else{
             this.returnButton.hide();
             isShowing = false;
+        }
+    }
+
+    public void clearSelections(){
+        this.selectedRelics.clear();
+        for (RelicUIObject relicObject : relicUIObjects.values()) {
+            relicObject.isEnabled = false;
         }
     }
 
@@ -311,6 +319,6 @@ public class RelicFilterScreen implements ScrollBarListener {
     }
 
     public void refreshFilters() {
-        selectedRelics = getEnabledRelics();
+        this.selectedRelics = getEnabledRelics();
     }
 }
