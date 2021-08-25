@@ -48,7 +48,7 @@ public class RelicFilterScreen implements ScrollBarListener {
         // Setup scrollbar
         if (this.scrollBar == null) {
             calculateScrollBounds();
-            this.scrollBar = new ScrollBar(this, 0, 0, 400.0F * Settings.scale);
+            this.scrollBar = new ScrollBar(this, 0, 0, 400.0F * Settings.yScale);
         }
 
         this.move(0, 0);
@@ -58,7 +58,7 @@ public class RelicFilterScreen implements ScrollBarListener {
         this.x = x;
         this.y = y;
 
-        scrollBar.setCenter(x + 1100f * Settings.scale, y + 465f * Settings.scale);
+        scrollBar.setCenter(x + 1100f * Settings.xScale, y + 465f * Settings.yScale);
     }
 
     //  Begin scroll functions
@@ -96,8 +96,8 @@ public class RelicFilterScreen implements ScrollBarListener {
     }
 
     private void calculateScrollBounds() {
-        this.scrollUpperBound = 100.0F * Settings.scale;
-        this.scrollLowerBound = 0F * Settings.scale;
+        this.scrollUpperBound = 100.0F * Settings.yScale;
+        this.scrollLowerBound = 0F * Settings.yScale;
     }
 
     private void resetScrolling() {
@@ -169,8 +169,11 @@ public class RelicFilterScreen implements ScrollBarListener {
     public void renderForeground(SpriteBatch sb) {
         sb.setColor(Color.WHITE);
 
-        for (RelicUIObject x : relicUIObjects.values())
-            x.render(sb);
+        for (RelicUIObject x : relicUIObjects.values()){
+            if (x.y > 1 && x.y < 3){
+                x.render(sb);
+            }
+        }
 
         this.returnButton.render(sb);
         this.scrollBar.render(sb);
@@ -178,8 +181,7 @@ public class RelicFilterScreen implements ScrollBarListener {
         // Title text
         float titleLeft = 386.0f;
         float titleBottom = 819.0f;
-        FontHelper.renderFontLeftDownAligned(sb, ExtraFonts.configTitleFont(), "Relic List", titleLeft * Settings.scale, titleBottom * Settings.scale, Settings.GOLD_COLOR);
-
+        FontHelper.renderFontLeftDownAligned(sb, ExtraFonts.configTitleFont(), "Relic List", titleLeft * Settings.xScale, titleBottom * Settings.yScale, Settings.GOLD_COLOR);
         float infoLeft = 1160.0f;
         float infoTopMain = 667.0f;
         float infoTopControls = 472.0f;
@@ -187,19 +189,19 @@ public class RelicFilterScreen implements ScrollBarListener {
         FontHelper.renderSmartText(sb,
                 FontHelper.tipBodyFont,
                 "This filter allows you to choose which Relics a run must have to show in the history.",
-                infoLeft * Settings.scale,
-                infoTopMain * Settings.scale,
-                371.0f * Settings.scale,
-                30.0f * Settings.scale,
+                infoLeft * Settings.xScale,
+                infoTopMain * Settings.yScale,
+                371.0f * Settings.xScale,
+                30.0f * Settings.yScale,
                 Settings.CREAM_COLOR);
 
         FontHelper.renderSmartText(sb,
                 FontHelper.tipBodyFont,
                 "Controls: NL Click to toggle NL Right+Click to select just one NL NL Shift+Click to select all NL Shift+Right+Click to clear all NL Alt+Click to invert all",
-                infoLeft * Settings.scale,
-                infoTopControls * Settings.scale,
-                371.0f * Settings.scale,
-                30.0f * Settings.scale,
+                infoLeft * Settings.xScale,
+                infoTopControls * Settings.yScale,
+                371.0f * Settings.xScale,
+                30.0f * Settings.yScale,
                 Color.GRAY);
     }
 
@@ -226,10 +228,10 @@ public class RelicFilterScreen implements ScrollBarListener {
         // Draw our screen texture in the center
         sb.setColor(Color.WHITE);
         sb.draw(TEX_BG,
-                (Settings.WIDTH - (TEX_BG.getWidth() * Settings.scale)) * 0.5f,
-                (Settings.HEIGHT - (TEX_BG.getHeight() * Settings.scale)) * 0.5f,
-                TEX_BG.getWidth() * Settings.scale,
-                TEX_BG.getHeight() * Settings.scale
+                (Settings.WIDTH - (TEX_BG.getWidth() * Settings.xScale)) * 0.5f,
+                (Settings.HEIGHT - (TEX_BG.getHeight() * Settings.yScale)) * 0.5f,
+                TEX_BG.getWidth() * Settings.xScale,
+                TEX_BG.getHeight() * Settings.yScale
         );
 
         renderForeground(sb);
