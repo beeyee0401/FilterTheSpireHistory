@@ -37,6 +37,8 @@ public class RunHistoryScreenPatch {
 
             if (relicFilterButton.hb.clickStarted) {
                 relicScreen.isShowing = true;
+                relicScreen.initialRelics.clear();
+                relicScreen.initialRelics.addAll(relicScreen.selectedRelics);
             }
             if (relicScreen.isShowing){
                 relicScreen.enableHitboxes(true);

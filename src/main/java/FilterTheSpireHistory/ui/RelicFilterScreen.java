@@ -24,10 +24,11 @@ public class RelicFilterScreen implements ScrollBarListener {
     private TreeSet<String> relics = new TreeSet<>();
     private HashMap<String, RelicUIObject> relicUIObjects = new HashMap<>();
     private Texture TEX_BG = new Texture("images/config_screen_bg.png");
-    private FilteredHistoryButton returnButton = new FilteredHistoryButton(256, 150, "Close");
+    private FilteredHistoryButton returnButton = new FilteredHistoryButton(256, 200, "Close");
     public ArrayList<String> selectedRelics = new ArrayList<>();
     public boolean isShowing = false;
     public final int RELICS_PER_ROW = 7;
+    public ArrayList<String> initialRelics = new ArrayList<>();
 
     // Position
     public float x;
@@ -254,8 +255,10 @@ public class RelicFilterScreen implements ScrollBarListener {
 
         if (this.returnButton.hb.clickStarted){
             enableHitboxes(false);
-            CardCrawlGame.mainMenuScreen.runHistoryScreen.button.showInstantly(RunHistoryScreen.TEXT[3]);
-            CardCrawlGame.mainMenuScreen.runHistoryScreen.refreshData();
+            if (this.initialRelics.size() != this.selectedRelics.size() ||
+                !this.initialRelics.equals(this.selectedRelics)) {
+                CardCrawlGame.mainMenuScreen.runHistoryScreen.refreshData();
+            }
         }
 
         boolean isDraggingScrollBar = this.scrollBar.update();
