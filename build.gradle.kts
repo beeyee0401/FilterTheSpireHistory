@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.accessors.runtime.externalModuleDependencyFor
+
 plugins {
     java
 }
@@ -22,13 +24,7 @@ repositories {
 
 dependencies {
     compileOnly(fileTree(compileOnlyLibs))
-    compileOnly("io.github.casey-c:easel:0.0.1")
     compileOnly("org.apache.commons:commons-lang3:3.12.0")
-
-    // Tests
-    testImplementation(fileTree(compileOnlyLibs))
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.0-M1")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.0-M1")
 }
 
 // --------------------------------------------------------------------------------

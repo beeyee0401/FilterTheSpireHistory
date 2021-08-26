@@ -12,7 +12,7 @@ import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.helpers.controller.CInputActionSet;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 
-public class FilteredHistoryButton {
+public class ActionButton {
     public boolean isHidden;
     public Hitbox hb;
     public float current_x;
@@ -26,17 +26,17 @@ public class FilteredHistoryButton {
     private static final float TEXT_OFFSET_X;
     private static final float TEXT_OFFSET_Y;
 
-    public FilteredHistoryButton(int drawX, int drawY, String buttonText) {
-        this.drawX = drawX * Settings.scale;
-        this.hideX = this.drawX - 400.0F * Settings.scale;
+    public ActionButton(int drawX, int drawY, String buttonText) {
+        this.drawX = drawX * Settings.xScale;
+        this.hideX = this.drawX - 400.0F * Settings.xScale;
         this.current_x = this.target_x = this.hideX;
         this.isHidden = true;
         this.glowAlpha = 0.0F;
         this.glowColor = Settings.GOLD_COLOR.cpy();
         this.buttonText = buttonText;
-        this.drawY = drawY * Settings.scale;
-        this.hb = new Hitbox(300.0F * Settings.scale, 100.0F * Settings.scale);
-        this.hb.move(this.drawX - 106.0F * Settings.scale, this.drawY + 60.0F * Settings.scale);
+        this.drawY = drawY * Settings.yScale;
+        this.hb = new Hitbox(300.0F * Settings.xScale, 100.0F * Settings.yScale);
+        this.hb.move(this.drawX - 106.0F * Settings.xScale, this.drawY + 60.0F * Settings.yScale);
     }
 
     public void update(){
@@ -105,7 +105,7 @@ public class FilteredHistoryButton {
         }
 
         if (Settings.isControllerMode) {
-            FontHelper.renderFontLeft(sb, FontHelper.buttonLabelFont, this.buttonText, this.current_x + TEXT_OFFSET_X - 30.0F * Settings.scale, this.drawY + TEXT_OFFSET_Y, tmpColor);
+            FontHelper.renderFontLeft(sb, FontHelper.buttonLabelFont, this.buttonText, this.current_x + TEXT_OFFSET_X - 30.0F * Settings.xScale, this.drawY + TEXT_OFFSET_Y, tmpColor);
         } else {
             FontHelper.renderFontCentered(sb, FontHelper.buttonLabelFont, this.buttonText, this.current_x + TEXT_OFFSET_X, this.drawY + TEXT_OFFSET_Y, tmpColor);
         }
@@ -117,21 +117,21 @@ public class FilteredHistoryButton {
     }
 
     private void renderShadow(SpriteBatch sb) {
-        sb.draw(ImageMaster.CANCEL_BUTTON_SHADOW, this.current_x - 256.0F, this.drawY - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
+        sb.draw(ImageMaster.CANCEL_BUTTON_SHADOW, this.current_x - 256.0F, this.drawY - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.xScale, Settings.yScale, 0.0F, 0, 0, 512, 256, false, false);
     }
 
     private void renderOutline(SpriteBatch sb) {
-        sb.draw(ImageMaster.CANCEL_BUTTON_OUTLINE, this.current_x - 256.0F, this.drawY - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
+        sb.draw(ImageMaster.CANCEL_BUTTON_OUTLINE, this.current_x - 256.0F, this.drawY - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.xScale, Settings.yScale, 0.0F, 0, 0, 512, 256, false, false);
     }
 
     private void renderButton(SpriteBatch sb) {
-        sb.draw(ImageMaster.CANCEL_BUTTON, this.current_x - 256.0F, this.drawY - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 512, 256, false, false);
+        sb.draw(ImageMaster.CANCEL_BUTTON, this.current_x - 256.0F, this.drawY - 128.0F, 256.0F, 128.0F, 512.0F, 256.0F, Settings.xScale, Settings.yScale, 0.0F, 0, 0, 512, 256, false, false);
     }
 
     private void renderControllerUi(SpriteBatch sb) {
         if (Settings.isControllerMode) {
             sb.setColor(Color.WHITE);
-            sb.draw(CInputActionSet.cancel.getKeyImg(), this.current_x - 32.0F - 210.0F * Settings.scale, this.drawY - 32.0F + 57.0F * Settings.scale, 32.0F, 32.0F, 64.0F, 64.0F, Settings.scale, Settings.scale, 0.0F, 0, 0, 64, 64, false, false);
+            sb.draw(CInputActionSet.cancel.getKeyImg(), this.current_x - 32.0F - 210.0F * Settings.xScale, this.drawY - 32.0F + 57.0F * Settings.yScale, 32.0F, 32.0F, 64.0F, 64.0F, Settings.xScale, Settings.yScale, 0.0F, 0, 0, 64, 64, false, false);
         }
 
     }
@@ -143,13 +143,12 @@ public class FilteredHistoryButton {
             this.target_x = this.drawX;
             this.isHidden = false;
         }
-
-        this.hb.hovered = false;
     }
 
     public void hide(){
         if (!this.isHidden) {
             this.hb.clicked = false;
+            this.hb.clickStarted = false;
             this.hb.hovered = false;
             InputHelper.justClickedLeft = false;
             this.current_x = this.hideX;
@@ -159,7 +158,7 @@ public class FilteredHistoryButton {
     }
 
     static {
-        TEXT_OFFSET_X = -136.0F * Settings.scale;
-        TEXT_OFFSET_Y = 57.0F * Settings.scale;
+        TEXT_OFFSET_X = -136.0F * Settings.xScale;
+        TEXT_OFFSET_Y = 57.0F * Settings.yScale;
     }
 }

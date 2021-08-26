@@ -1,6 +1,7 @@
 package FilterTheSpireHistory.ui;
 
 import FilterTheSpireHistory.utils.ExtraColors;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -9,16 +10,16 @@ import com.megacrit.cardcrawl.core.Settings;
 import com.megacrit.cardcrawl.helpers.Hitbox;
 import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
-import easel.utils.KeyHelper;
 
 public class RelicUIObject {
 
     private Hitbox hb;
 
     public String relicID;
-    private float x, y;
+    private float x, y, scroll;
     private Texture tex;
     private static final Texture TEX_SELECTED_BG = new Texture("images/relic_bg.png");
+    private static final int HITBOX_OFFSET = 50;
 
     public boolean isEnabled = false;
     private RelicFilterScreen parent;
@@ -31,13 +32,19 @@ public class RelicUIObject {
         this.parent = parent;
 
         int hbSize = 75;
-        hb = new Hitbox(hbSize * Settings.scale, hbSize * Settings.scale);
+        hb = new Hitbox(hbSize * Settings.xScale, hbSize * Settings.yScale);
+    }
+
+    public void scroll(float scrollY) {
+        this.scroll = scrollY * ((Settings.SCROLL_SPEED / parent.RELICS_PER_ROW) - 1);
+    }
+
+    public float getScrollPosition(){
+        return (y + this.scroll) * Settings.yScale;
     }
 
     public void enableHitbox() {
-        // Need to adjust them (hb are centered) -- this random guess is probably totally off
-        int hbOffset = 50;
-        hb.move((x + hbOffset) * Settings.scale, (y + hbOffset) * Settings.scale);
+        hb.move((x + HITBOX_OFFSET) * Settings.xScale, (y + HITBOX_OFFSET + this.scroll) * Settings.yScale);
     }
 
     public void disableHitbox() {
@@ -51,26 +58,25 @@ public class RelicUIObject {
 
         if (isEnabled) {
             sb.setColor(ExtraColors.SEL_RELIC_BG);
-            sb.draw(TEX_SELECTED_BG, x * Settings.scale, y * Settings.scale, s * Settings.scale, s * Settings.scale);
+            sb.draw(TEX_SELECTED_BG, x * Settings.xScale, (y + this.scroll) * Settings.yScale, s * Settings.xScale, s * Settings.yScale);
 
             sb.setColor(Color.WHITE);
         } else {
             sb.setColor(ExtraColors.DIM_RELIC);
         }
 
-
-        sb.draw(tex, x * Settings.scale, y * Settings.scale, s * Settings.scale, s * Settings.scale);
+        sb.draw(tex, x * Settings.xScale, (y + this.scroll) * Settings.yScale, s * Settings.xScale, s * Settings.yScale);
 
         // DEBUG
         hb.render(sb);
     }
 
     private void handleClick() {
-        if (KeyHelper.isShiftPressed()) {
+        if (Gdx.input.isKeyPressed(59) || Gdx.input.isKeyPressed(60)) {
             CardCrawlGame.sound.play("BLOOD_SPLAT");
             parent.selectAll();
         }
-        else if (KeyHelper.isAltPressed()) {
+        else if (Gdx.input.isKeyPressed(57) || Gdx.input.isKeyPressed(58)) {
             CardCrawlGame.sound.play("MAP_SELECT_3");
             parent.invertAll();
         }
@@ -84,7 +90,7 @@ public class RelicUIObject {
     }
 
     private void handleRightClick() {
-        if (KeyHelper.isShiftPressed()) {
+        if (Gdx.input.isKeyPressed(59) || Gdx.input.isKeyPressed(60)) {
             CardCrawlGame.sound.play("APPEAR");
             parent.clearAll();
         }
