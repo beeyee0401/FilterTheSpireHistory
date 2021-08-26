@@ -1,6 +1,6 @@
 package FilterTheSpireHistory.patches;
 
-import FilterTheSpireHistory.ui.FilteredHistoryButton;
+import FilterTheSpireHistory.ui.ActionButton;
 import FilterTheSpireHistory.ui.RelicFilterScreen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInsertPatch;
@@ -12,8 +12,8 @@ import com.megacrit.cardcrawl.screens.stats.RunData;
 import java.util.ArrayList;
 
 public class RunHistoryScreenPatch {
-    private static FilteredHistoryButton relicFilterButton = new FilteredHistoryButton(256, 400, "Relic Filter");
-    private static FilteredHistoryButton cardFilterButton = new FilteredHistoryButton(256, 300, "Card Filter");
+    private static ActionButton relicFilterButton = new ActionButton(256, 400, "Relic Filter");
+    private static ActionButton cardFilterButton = new ActionButton(256, 300, "Card Filter");
     private static RelicFilterScreen relicScreen = new RelicFilterScreen();
 
     @SpirePatch(clz= RunHistoryScreen.class, method="render")
@@ -33,7 +33,6 @@ public class RunHistoryScreenPatch {
         public static SpireReturn Prefix(RunHistoryScreen __instance) {
             relicFilterButton.update();
             cardFilterButton.update();
-            relicScreen.update();
 
             if (relicFilterButton.hb.clickStarted) {
                 relicScreen.isShowing = true;
@@ -41,6 +40,7 @@ public class RunHistoryScreenPatch {
                 relicScreen.initialRelics.addAll(relicScreen.selectedRelics);
             }
             if (relicScreen.isShowing){
+                relicScreen.update();
                 relicScreen.enableHitboxes(true);
                 return SpireReturn.Return(null);
             }

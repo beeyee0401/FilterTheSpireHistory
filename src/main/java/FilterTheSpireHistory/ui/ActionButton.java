@@ -12,7 +12,7 @@ import com.megacrit.cardcrawl.helpers.ImageMaster;
 import com.megacrit.cardcrawl.helpers.controller.CInputActionSet;
 import com.megacrit.cardcrawl.helpers.input.InputHelper;
 
-public class FilteredHistoryButton {
+public class ActionButton {
     public boolean isHidden;
     public Hitbox hb;
     public float current_x;
@@ -26,7 +26,7 @@ public class FilteredHistoryButton {
     private static final float TEXT_OFFSET_X;
     private static final float TEXT_OFFSET_Y;
 
-    public FilteredHistoryButton(int drawX, int drawY, String buttonText) {
+    public ActionButton(int drawX, int drawY, String buttonText) {
         this.drawX = drawX * Settings.xScale;
         this.hideX = this.drawX - 400.0F * Settings.xScale;
         this.current_x = this.target_x = this.hideX;
@@ -143,8 +143,6 @@ public class FilteredHistoryButton {
             this.target_x = this.drawX;
             this.isHidden = false;
         }
-
-        this.hb.hovered = false;
     }
 
     public void hide(){
