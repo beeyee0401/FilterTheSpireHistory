@@ -1,11 +1,14 @@
 package FilterTheSpireHistory.patches;
 
+import FilterTheSpireHistory.FilterTheSpireHistory;
 import FilterTheSpireHistory.ui.ActionButton;
+import FilterTheSpireHistory.ui.CardFilterScreen;
 import FilterTheSpireHistory.ui.RelicFilterScreen;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireInsertPatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpirePatch;
 import com.evacipated.cardcrawl.modthespire.lib.SpireReturn;
+import com.megacrit.cardcrawl.dungeons.AbstractDungeon;
 import com.megacrit.cardcrawl.screens.runHistory.RunHistoryScreen;
 import com.megacrit.cardcrawl.screens.stats.RunData;
 
@@ -15,6 +18,7 @@ public class RunHistoryScreenPatch {
     private static ActionButton relicFilterButton = new ActionButton(256, 400, "Relic Filter");
     private static ActionButton cardFilterButton = new ActionButton(256, 300, "Card Filter");
     private static RelicFilterScreen relicScreen = new RelicFilterScreen();
+    private static CardFilterScreen cardScreen = new CardFilterScreen();
 
     @SpirePatch(clz= RunHistoryScreen.class, method="render")
     public static class RenderFilteredButton {
@@ -24,6 +28,10 @@ public class RunHistoryScreenPatch {
 
             if (relicScreen.isShowing){
                 relicScreen.render(sb);
+            }
+
+            if (cardScreen.isShowing){
+                cardScreen.render(sb);
             }
         }
     }
@@ -46,7 +54,13 @@ public class RunHistoryScreenPatch {
             }
 
             if (cardFilterButton.hb.clicked) {
-                // card filter button clicked
+                cardScreen.isShowing = true;
+                cardScreen.initialCards.clear();
+                cardScreen.initialCards.addAll(cardScreen.selectedCards);
+            }
+            if (cardScreen.isShowing){
+                cardScreen.update();
+                return SpireReturn.Return(null);
             }
 
             return SpireReturn.Continue();
